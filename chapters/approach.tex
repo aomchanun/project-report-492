@@ -19,79 +19,221 @@
 % \titleformat{\section}{\normalfont\bfseries}{\thesection}{1em}{}
 % \titlespacing*{\section}{0pt}{10ex}{0pt}
 
-\section{Alice in Wonderland}
+\section{Model Selection}
 
-\begin{figure}
-\begin{center}
-\includegraphics{800px-Briny_Beach.jpg}
-\end{center}
-\caption[Poem]{The Walrus and the Carpenter}
-\label{fig:walrus}
-\end{figure}
+ในการศึกษาครั้งนี้ได้ทำการคัดเลือกโมเดล (Model Selection) ซึ่งได้เลือก โมเดลจาก github qubvel/segmentation\_models โดยเลือก encoder และ decoder มาอย่างละ 5 อัน รวมทั้งสิน 25 โมเดล เพื่อนำมาทดสอบประสิทธิภาพกับชุดข้อมูล (Dataset) ของเรา โดยมีผลการทดสอบของโมเดลทั้งหมดที่ใช้ในการทดลองดังตารางที่ \ref{tab:all_models} ซึ่งแสดงค่า F1-Score, IoU และ Inference Time (วินาทีต่อรูปภาพ)
 
-\subsection{The Black Kitten}
-  One thing was certain, that the WHITE kitten had had nothing to
-do with it:---it was the black kitten's fault entirely~\cite{aiw}.  For the
-white kitten had been having its face washed by the old cat for
-the last quarter of an hour (and bearing it pretty well,
-considering); so you see that it COULDN'T have had any hand in
-the mischief.
+\begin{table}[hbt!]
+\centering
+\caption{ผลการทดสอบของโมเดลทั้ง 25 โมเดล}
+\label{tab:all_models}
+\begin{tabular}{|c|l|c|c|c|}
+\hline
+\textbf{ลำดับ} & \textbf{ชื่อโมเดล (Model)} & \textbf{F1-Score} & \textbf{IoU} & \textbf{Inference Time (s)} \\
+\hline
+1 & Linknet-resnet101 & 0.8263 & 0.7138 & 0.6688 \\
+2 & UPerNet-resnet101 & 0.8240 & 0.7103 & 0.9418 \\
+3 & Linknet-resnet50 & 0.8194 & 0.7055 & 0.4635 \\
+4 & Unet-efficient-b7 & 0.8163 & 0.7010 & 0.9906 \\
+5 & DeepLabV3-resnet101 & 0.8134 & 0.6955 & 0.6985 \\
+6 & Unet-efficient-b3 & 0.8130 & 0.6964 & 0.4019 \\
+7 & Unet-resnet & 0.8121 & 0.6951 & 0.7081 \\
+8 & DeepLabV3-resnet50 & 0.8099 & 0.6916 & 0.4979 \\
+9 & FPN-efficient-b3 & 0.8090 & 0.6904 & 0.3692 \\
+10 & UPerNet-efficient-b7 & 0.8084 & 0.6908 & 1.2527 \\
+11 & UPerNet-resnet50 & 0.8073 & 0.6875 & 0.8029 \\
+12 & FPN-resnet101 & 0.8057 & 0.6854 & 0.6163 \\
+13 & DeepLabV3-mobilenet\_v2 & 0.8050 & 0.6837 & 0.1927 \\
+14 & DeepLabV3-efficientnet-b7 & 0.8036 & 0.6833 & 1.3603 \\
+15 & Unet-resnet50 & 0.8022 & 0.6844 & 0.5174 \\
+16 & UPerNet-efficient-b3 & 0.8000 & 0.6791 & 0.6915 \\
+17 & Unet-mobilenet\_v2 & 0.7954 & 0.6729 & 0.2356 \\
+18 & DeepLabV3-efficientnet-b3 & 0.7945 & 0.6728 & 0.3783 \\
+19 & FPN-efficient-b7 & 0.7927 & 0.6699 & 1.0059 \\
+20 & Linknet-efficient-b3 & 0.7920 & 0.6923 & 0.3146 \\
+21 & UPerNet-mobilenet\_v2 & 0.7908 & 0.6658 & 0.5157 \\
+22 & FPN-mobilenet\_v2 & 0.7863 & 0.6592 & 0.2116 \\
+23 & FPN-resnet50 & 0.7830 & 0.6543 & 0.4201 \\
+24 & Linknet-efficient-b7 & 0.7755 & 0.6586 & 0.9310 \\
+25 & Linknet-mobilenet\_v2 & 0.7583 & 0.6739 & 0.1310 \\
+\hline
+\multicolumn{2}{|c|}{\textbf{ค่าเฉลี่ย (Average)}} & \textbf{0.8018} & \textbf{0.6845} & \textbf{0.6127} \\
+\hline
+\end{tabular}
+\end{table}
 
-  The way Dinah washed her children's faces was this:  first she
-held the poor thing down by its ear with one paw, and then with
-the other paw she rubbed its face all over, the wrong way,
-beginning at the nose:  and just now, as I said, she was hard at
-work on the white kitten, which was lying quite still and trying
-to purr---no doubt feeling that it was all meant for its good.
+จากผลการทดสอบในตารางที่ \ref{tab:all_models} ในตอนแรกผู้วิจัยได้พิจารณาเลือกใช้โมเดล \textbf{Linknet-resnet101} เนื่องจากมีค่า F1-Score สูงที่สุด (0.8263) อย่างไรก็ตาม เมื่อพิจารณาผลลัพธ์ภาพกราฟิกจากการจำแนกจริง (Visual Inspection) พบว่าบริเวณขอบของวัตถุมีลักษณะแตกและไม่เรียบเนียน ซึ่งอาจส่งผลกระทบต่อความแม่นยำในการนำไปใช้งานจริง ดังนั้น ผู้วิจัยจึงได้เพิ่มตัวชี้วัด \textbf{Hausdorff Distance} เข้ามาเพื่อใช้ในการประเมินความคลาดเคลื่อนของขอบภาพอย่างละเอียดมากยิ่งขึ้น (โดยที่ค่า Hausdorff Distance ยิ่งต่ำยิ่งบ่งบอกถึงขอบที่แม่นยำและแนบเนียนมากขึ้น)
 
-  But the black kitten had been finished with earlier in the
-afternoon, and so, while Alice was sitting curled up in a corner
-of the great arm-chair, half talking to herself and half asleep,
-the kitten had been having a grand game of romps with the ball of
-worsted Alice had been trying to wind up, and had been rolling it
-up and down till it had all come undone again; and there it was,
-spread over the hearth-rug, all knots and tangles, with the
-kitten running after its own tail in the middle.
+ผลการทำการทดสอบที่นำค่า Hausdorff Distance มาร่วมพิจารณาสำหรับทั้ง 25 โมเดล แสดงไว้ดังตารางที่ \ref{tab:all_models_hausdorff}
 
-\subsection{The Reproach}
+\begin{table}[hbt!]
+\centering
+\caption{ผลการทดสอบของโมเดลทั้ง 25 โมเดล โดยเพิ่มตัวชี้วัด Hausdorff Distance}
+\label{tab:all_models_hausdorff}
+\begin{tabular}{|c|l|c|c|c|c|}
+\hline
+\textbf{ลำดับ} & \textbf{ชื่อโมเดล (Model)} & \textbf{F1-Score} & \textbf{IoU} & \textbf{Hausdorff} & \textbf{Inference Time (s)} \\
+\hline
+1 & Linknet-resnet101 & 0.8263 & 0.7138 & 78.2667 & 0.6688 \\
+2 & UPerNet-resnet101 & 0.8240 & 0.7103 & 52.3718 & 0.9418 \\
+3 & Linknet-resnet50 & 0.8194 & 0.7055 & 74.4905 & 0.4635 \\
+4 & Unet-efficient-b7 & 0.8163 & 0.7010 & 77.1968 & 0.9906 \\
+5 & DeepLabV3-resnet101 & 0.8134 & 0.6955 & 55.7222 & 0.6985 \\
+6 & Unet-efficient-b3 & 0.8130 & 0.6964 & 74.7506 & 0.4019 \\
+7 & Unet-resnet & 0.8121 & 0.6951 & 77.0389 & 0.7081 \\
+8 & DeepLabV3-resnet50 & 0.8099 & 0.6916 & 56.9831 & 0.4979 \\
+9 & FPN-efficient-b3 & 0.8090 & 0.6904 & 60.5217 & 0.3692 \\
+10 & UPerNet-efficient-b7 & 0.8084 & 0.6908 & 57.7180 & 1.2527 \\
+11 & UPerNet-resnet50 & 0.8073 & 0.6875 & 59.2978 & 0.8029 \\
+12 & FPN-resnet101 & 0.8057 & 0.6854 & 55.6652 & 0.6163 \\
+13 & DeepLabV3-mobilenet\_v2 & 0.8050 & 0.6837 & 58.6067 & 0.1927 \\
+14 & DeepLabV3-efficientnet-b7 & 0.8036 & 0.6833 & 55.8317 & 1.3603 \\
+15 & Unet-resnet50 & 0.8022 & 0.6844 & 74.7560 & 0.5174 \\
+16 & UPerNet-efficient-b3 & 0.8000 & 0.6791 & 62.0261 & 0.6915 \\
+17 & Unet-mobilenet\_v2 & 0.7954 & 0.6729 & 74.3620 & 0.2356 \\
+18 & DeepLabV3-efficientnet-b3 & 0.7945 & 0.6728 & 57.6671 & 0.3783 \\
+19 & FPN-efficient-b7 & 0.7927 & 0.6699 & 66.2021 & 1.0059 \\
+20 & Linknet-efficient-b3 & 0.7920 & 0.6923 & 198.9889 & 0.3146 \\
+21 & UPerNet-mobilenet\_v2 & 0.7908 & 0.6658 & 63.5663 & 0.5157 \\
+22 & FPN-mobilenet\_v2 & 0.7863 & 0.6592 & 69.1811 & 0.2116 \\
+23 & FPN-resnet50 & 0.7830 & 0.6543 & 65.4966 & 0.4201 \\
+24 & Linknet-efficient-b7 & 0.7755 & 0.6586 & 141.6082 & 0.9310 \\
+25 & Linknet-mobilenet\_v2 & 0.7583 & 0.6739 & 230.5526 & 0.1310 \\
+\hline
+\multicolumn{2}{|c|}{\textbf{ค่าเฉลี่ย (Average)}} & \textbf{0.8018} & \textbf{0.6845} & \textbf{79.9547} & \textbf{0.6127} \\
+\hline
+\end{tabular}
+\end{table}
 
-  `Oh, you wicked little thing!' cried Alice, catching up the
-kitten, and giving it a little kiss to make it understand that it
-was in disgrace.  `Really, Dinah ought to have taught you better
-manners!  You OUGHT, Dinah, you know you ought!' she added,
-looking reproachfully at the old cat, and speaking in as cross a
-voice as she could manage---and then she scrambled back into the
-arm-chair, taking the kitten and the worsted with her, and began
-winding up the ball again.  But she didn't get on very fast, as
-she was talking all the time, sometimes to the kitten, and
-sometimes to herself.  Kitty sat very demurely on her knee,
-pretending to watch the progress of the winding, and now and then
-putting out one paw and gently touching the ball, as if it would
-be glad to help, if it might.
+จากตารางที่ \ref{tab:all_models_hausdorff} ภายหลังจากที่ได้เพิ่มตัวชี้วัด Hausdorff Distance เข้ามาพิจารณาร่วมด้วย พบว่าโมเดลสถาปัตยกรรมกลุ่ม Linknet ทุกตัวมีค่า Hausdorff Distance ที่ค่อนข้างสูงมากอย่างเห็นได้ชัด และโมเดลในกลุ่ม Unet ก็มีค่าตัวชี้วัดนี้ในระดับที่สูงพอๆ กัน ซึ่งค่า Hausdorff Distance ที่สูงนั้นบ่งบอกถึงผลลัพธ์ของขอบภาพที่ไม่แนบเนียนและมีความคลาดเคลื่อนสูง ฉะนั้น เราจึงได้คัดกรองโดยสร้างตารางใหม่ที่จะทำการลบโมเดลในกลุ่ม Linknet และ Unet ออกทั้งหมด เพื่อให้เหลือเฉพาะกลุ่มโมเดลที่ให้ความสำคัญกับรายละเอียดของขอบเขตได้ดียิ่งขึ้น
 
-  `Do you know what to-morrow is, Kitty?' Alice began.  `You'd
-have guessed if you'd been up in the window with me---only Dinah
-was making you tidy, so you couldn't.  I was watching the boys
-getting in stick for the bonfire---and it wants plenty of
-sticks, Kitty!  Only it got so cold, and it snowed so, they had
-to leave off.  Never mind, Kitty, we'll go and see the bonfire
-to-morrow.'  Here Alice wound two or three turns of the worsted
-round the kitten's neck, just to see how it would look:  this led
-to a scramble, in which the ball rolled down upon the floor, and
-yards and yards of it got unwound again.
+\begin{table}[hbt!]
+\centering
+\caption{ผลการทดสอบของโมเดลหลังจากตัดกลุ่ม Linknet และ Unet ออก}
+\label{tab:filtered_models_no_linknet_unet}
+\begin{tabular}{|c|l|c|c|c|c|}
+\hline
+\textbf{ลำดับ} & \textbf{ชื่อโมเดล (Model)} & \textbf{F1-Score} & \textbf{IoU} & \textbf{Hausdorff} & \textbf{Inference Time (s)} \\
+\hline
+2 & UPerNet-resnet101 & 0.8240 & 0.7103 & 52.3718 & 0.9418 \\
+5 & DeepLabV3-resnet101 & 0.8134 & 0.6955 & 55.7222 & 0.6985 \\
+8 & DeepLabV3-resnet50 & 0.8099 & 0.6916 & 56.9831 & 0.4979 \\
+9 & FPN-efficient-b3 & 0.8090 & 0.6904 & 60.5217 & 0.3692 \\
+10 & UPerNet-efficient-b7 & 0.8084 & 0.6908 & 57.7180 & 1.2527 \\
+11 & UPerNet-resnet50 & 0.8073 & 0.6875 & 59.2978 & 0.8029 \\
+12 & FPN-resnet101 & 0.8057 & 0.6854 & 55.6652 & 0.6163 \\
+13 & DeepLabV3-mobilenet\_v2 & 0.8050 & 0.6837 & 58.6067 & 0.1927 \\
+14 & DeepLabV3-efficientnet-b7 & 0.8036 & 0.6833 & 55.8317 & 1.3603 \\
+16 & UPerNet-efficient-b3 & 0.8000 & 0.6791 & 62.0261 & 0.6915 \\
+18 & DeepLabV3-efficientnet-b3 & 0.7945 & 0.6728 & 57.6671 & 0.3783 \\
+19 & FPN-efficient-b7 & 0.7927 & 0.6699 & 66.2021 & 1.0059 \\
+21 & UPerNet-mobilenet\_v2 & 0.7908 & 0.6658 & 63.5663 & 0.5157 \\
+22 & FPN-mobilenet\_v2 & 0.7863 & 0.6592 & 69.1811 & 0.2116 \\
+23 & FPN-resnet50 & 0.7830 & 0.6543 & 65.4966 & 0.4201 \\
+\hline
+\multicolumn{2}{|c|}{\textbf{ค่าเฉลี่ยใหม่ (New Average)}} & \textbf{0.8022} & \textbf{0.6813} & \textbf{59.7905} & \textbf{0.6637} \\
+\hline
+\end{tabular}
+\end{table}
 
-  `Do you know, I was so angry, Kitty,' Alice went on as soon as
-they were comfortably settled again, `when I saw all the mischief
-you had been doing, I was very nearly opening the window, and
-putting you out into the snow!  And you'd have deserved it, you
-little mischievous darling!  What have you got to say for
-yourself?  Now don't interrupt me!' she went on, holding up one
-finger.  `I'm going to tell you all your faults.  Number one:
-you squeaked twice while Dinah was washing your face this
-morning.  Now you can't deny it, Kitty:  I heard you!  What that
-you say?' (pretending that the kitten was speaking.)  `Her paw
-went into your eye?  Well, that's YOUR fault, for keeping your
-eyes open---if you'd shut them tight up, it wouldn't have
-happened.  Now don't make any more excuses, but listen!  Number
-two:  you pulled Snowdrop away by the tail just as I had put down
-the saucer of milk before her!  What, you were thirsty, were you?
+จากนั้น เพื่อที่จะคัดเลือกโมเดลที่มีประสิทธิภาพสูงสุดและมีความเหมาะสมที่สุดสำหรับการนำไปใช้งาน ผู้วิจัยได้ตั้งเกณฑ์การคัดกรองขั้นสุดท้ายอย่างเข้มงวด โดยอ้างอิงจากค่าเฉลี่ยใหม่ในตารางที่ \ref{tab:filtered_models_no_linknet_unet} ซึ่งหากมีโมเดลใดที่มีตัวชี้วัดแม้เพียงตัวเดียวที่ให้ผลลัพธ์ด้อยกว่าค่าเฉลี่ยนี้ (กล่าวคือ มีค่า F1-Score ต่ำกว่า 0.8022 หรือ IoU ต่ำกว่า 0.6813 หรือมีค่า Hausdorff Distance สูงกว่า 59.7905 หรือ Inference Time สูงกว่า 0.6637 วินาที) โมเดลนั้นจะถูกคัดออกจากการพิจารณาทันที
+
+ผลลัพธ์จากการคัดกรองพบว่า มีโมเดลที่ผ่านเกณฑ์ดังกล่าวและทำคะแนนได้ดีกว่าค่าเฉลี่ยในครบทุกตัวชี้วัดจำนวนทั้งสิ้น 3 โมเดล ซึ่งแสดงรายละเอียดเป็นตารางสรุปผลสุดท้ายดังตารางที่ \ref{tab:final_filtered_models}
+
+\begin{table}[hbt!]
+\centering
+\caption{ผลการทดสอบของโมเดลที่ผ่านเกณฑ์สุดท้าย (ทุกตัวชี้วัดดีกว่าหรือเท่ากับค่าเฉลี่ยใหม่)}
+\label{tab:final_filtered_models}
+\begin{tabular}{|c|l|c|c|c|c|}
+\hline
+\textbf{ลำดับ} & \textbf{ชื่อโมเดล (Model)} & \textbf{F1-Score} & \textbf{IoU} & \textbf{Hausdorff} & \textbf{Inference Time (s)} \\
+\hline
+8 & DeepLabV3-resnet50 & 0.8099 & 0.6916 & 56.9831 & 0.4979 \\
+12 & FPN-resnet101 & 0.8057 & 0.6854 & 55.6652 & 0.6163 \\
+13 & DeepLabV3-mobilenet\_v2 & 0.8050 & 0.6837 & 58.6067 & 0.1927 \\
+\hline
+\multicolumn{2}{|c|}{\textbf{ค่าเฉลี่ยสุดท้าย (Final Average)}} & \textbf{0.8069} & \textbf{0.6869} & \textbf{57.0850} & \textbf{0.4356} \\
+\hline
+\end{tabular}
+\end{table}
+
+อย่างไรก็ตาม เนื่องจากตัวชี้วัด IoU และ F1-Score มีลักษณะการประเมินความแม่นยำและทิศทางของผลลัพธ์ที่คล้ายคลึงกัน (ประเมินความทับซ้อนของพื้นที่การทำนายและเฉลย) ผู้วิจัยจึงได้พิจารณาตัดการพิจารณาด้าน IoU ออกในขั้นตอนสุดท้ายเพื่อลดความซ้ำซ้อน จากนั้นจึงนำตัวชี้วัดที่เหลือทั้ง 3 ตัว ได้แก่ F1-Score, Hausdorff Distance และ Inference Time มาทำการจัดอันดับ (Ranking) แบบ 1 ถึง 3 (โดยอันดับ 1 คืออันดับที่ดีที่สุด) สำหรับทั้ง 3 โมเดลสุดท้าย เพื่อค้นหาโมเดลที่มีความสมดุลและมีประสิทธิภาพโดยรวมสูงที่สุด ดังผลลัพธ์การจัดอันดับที่แสดงในตารางที่ \ref{tab:model_ranking}
+
+\begin{table}[hbt!]
+\centering
+\caption{ผลการจัดอันดับโมเดล (Ranking) จาก 3 ตัวชี้วัดที่เหลือ}
+\label{tab:model_ranking}
+\begin{tabular}{|c|l|c|c|c|c|}
+\hline
+\textbf{ลำดับ} & \textbf{ชื่อโมเดล (Model)} & \textbf{Rank (F1-Score)} & \textbf{Rank (Hausdorff)} & \textbf{Rank (Inference Time)} & \textbf{คะแนนรวม (ยิ่งน้อยยิ่งดี)} \\
+\hline
+8 & DeepLabV3-resnet50 & 1 & 2 & 2 & \textbf{5} \\
+12 & FPN-resnet101 & 2 & 1 & 3 & 6 \\
+13 & DeepLabV3-mobilenet\_v2 & 3 & 3 & 1 & 7 \\
+\hline
+\end{tabular}
+\end{table}
+
+จากตารางที่ \ref{tab:model_ranking} จะพบว่าเมื่อนำอันดับจากทั้ง 3 ตัวชี้วัดมารวมกัน โมเดล \textbf{DeepLabV3-resnet50} มีผลรวมของคะแนนอันดับที่น้อยที่สุด (5 คะแนน) ซึ่งแสดงให้เห็นอย่างชัดเจนถึงความสมดุลที่ยอดเยี่ยมระหว่างความแม่นยำที่สูงที่สุด (อันดับ 1 ในด้าน F1-Score) ความทนทานและความแม่นยำด้านขอบเขตของภาพ (อันดับ 2 ด้าน Hausdorff) รวมถึงความรวดเร็วในการประมวลผล (อันดับ 2 ด้าน Inference Time) ด้วยเหตุนี้ในงานวิจัยนี้ จึงได้ตัดสินใจคัดเลือกโมเดล \textbf{DeepLabV3-resnet50} เพื่อนำไปใช้งานและพัฒนาจริงในขั้นตอนถัดไป
+
+\section{การ Train}
+
+ในการฝึกสอน (Train) โมเดล ได้มีการกำหนดองค์ประกอบต่างๆ รวมถึงสัดส่วนข้อมูล ได้แก่ ชุดข้อมูลสำหรับฝึกสอน (Train) 80\%, ชุดข้อมูลสำหรับตรวจสอบความถูกต้อง (Validation) 10\% และชุดข้อมูลสำหรับทดสอบ (Test) 10\% 
+
+สำหรับการตั้งค่าสำหรับการฝึกสอนตัวแบบ (Setup) และเทคนิคการเพิ่มความหลากหลายของข้อมูล (Data Augmentation) ได้มีการสรุปรายละเอียดไว้ดังตารางที่ \ref{tab:train_setup} และ \ref{tab:data_augmentation} ตามลำดับ
+
+\begin{table}[hbt!]
+\centering
+\caption{การตั้งค่าพารามิเตอร์สำหรับการฝึกสอน (Hyperparameters Setup)}
+\label{tab:train_setup}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{รายการพารามิเตอร์} & \textbf{รายละเอียด} \\
+\hline
+ขนาดภาพ (Image Size) & $512 \times 512$ พิกเซล \\
+Optimizer & Adam \\
+Learning Rate (เริ่มต้น) & $1 \times 10^{-4}$ \\
+Batch Size & 16 \\
+จำนวนรอบ (Epochs) & 100 \\
+การหยุดก่อนกำหนด (Early Stopping) & 25 Epochs \\
+การปรับลด Learning Rate & ลดครึ่งหนึ่งเมื่อ Val Loss นิ่ง 8 Epochs (ต่ำสุด $1 \times 10^{-7}$) \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[hbt!]
+\centering
+\caption{การเพิ่มปริมาณและปรับแต่งข้อมูล (Data Augmentation)}
+\label{tab:data_augmentation}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{เทคนิคที่ใช้งาน} & \textbf{รายละเอียด} \\
+\hline
+การพลิกภาพ (Horizontal Flip) & พลิกแนวนอนแบบสุ่ม \\
+การหมุนภาพ (Rotation) & $-45^{\circ}$ ถึง $45^{\circ}$ \\
+การเลื่อนภาพ (Translate) & $(0.1, 0.1)$ \\
+การปรับอัตราส่วน (Scale) & $0.9$ ถึง $1.1$ \\
+การปรับแต่งสี (Color Jitter) & ปรับความสว่าง, ความเปรียบต่าง, ความอิ่มตัว \\
+การเบลอภาพ (Gaussian Blur) & เบลอเฉพาะบางส่วนของภาพ \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{เหตุผลในการเลือกใช้ฟังก์ชันสูญเสีย (Loss Function):}
+ในการฝึกสอนโมเดล มีการใช้งาน \textbf{Dice Loss} ร่วมกับ \textbf{Cross-Entropy Loss} สาเหตุหลักมาจากการที่ Cross-Entropy Loss เป็นฟังก์ชันมาตรฐานที่ช่วยประเมินและลดทอนความคลาดเคลื่อนในการพยากรณ์พิกเซล ทำให้เสถียรภาพของการแยกแยะคลาสโดยรวมทำงานได้นิ่งและเป็นธรรมชาติ ในขณะเดียวกัน ภาพในการแบ่งส่วนรอยโรคส่วนใหญ่มักประสบปัญหาความไม่สมดุลของคลาส (Class Imbalance) ระหว่างพื้นที่ส่วนที่เป็นรอยโรคกับพื้นที่ส่วนที่เป็นพื้นหลัง (Background) ซึ่งมีขนาดใหญ่กว่ามาก ดังนั้น การใช้ฟังก์ชัน Dice Loss ที่มุ่งเน้นไปที่ค่าความทับซ้อน (Intersection over Union) ร่วมด้วย จึงเป็นการช่วยบังคับให้โมเดลหันมาให้ความสำคัญกับคลาสที่เป็นรอยโรคที่มีขนาดเล็กกว่าอย่างมีประสิทธิภาพมากยิ่งขึ้น ส่งผลให้ความสมบูรณ์และพิกัดความแม่นยำของการจำแนกพื้นที่ (Segmentation accuracy) มีประสิทธิภาพสูงสุด
+
+\section{การ Test}
+
+ภายหลังจากขั้นตอนการฝึกสอนตัวแบบ การทดสอบและประเมินผลสมรรถนะ (Test) นับเป็นกระบวนการที่มีความสำคัญเพื่อประเมินขีดความสามารถที่แท้จริงของโมเดลสำหรับการนำไปใช้งาน โดยใช้ข้อมูลในส่วนของชุดทดสอบ (Test Set) ซึ่งเป็นรูปภาพที่ตัวแบบไม่เคยเห็นจากการฝีกสอนมาก่อนเลย (Unseen Data) ทำให้ผู้วิจัยสามารถสังเกตพัฒนาการและการเรียนรู้ประยุกต์ใช้ลักษณะเด่นของโมเดลต่อข้อมูลในสถานการณ์ที่เป็นรูปภาพใหม่ได้อย่างแม่นยำ
+
+สำหรับการประเมินประสิทธิภาพของการแบ่งส่วน (Segmentation Evaluation) ในโปรเจกต์นี้ ตัวชี้วัดที่ถูกนำมาพิจารณาประกอบไปด้วย 5 ค่าหลัก ดังต่อไปนี้:
+\begin{itemize}
+    \item \textbf{Precision:} มาตรวัดความถูกต้องของการทำนาย ว่าจากทุกพิกเซลที่โมเดลระบุและตั้งความน่าจะเป็นว่าเป็นเนื้อเยื่อเป้าหมายหรือรอยโรค มีกี่พิกเซลที่เป็นความจริง
+    \item \textbf{Recall:} สะท้อนให้เห็นว่า จากพื้นที่ที่เป็นรอยโรคทั้งหมดที่มีในภาพกราวด์ทรูธ (Ground Truth) โมเดลสามารถตรวจจับและทำนายครอบคลุมมากน้อยเพียงใด ช่วยชี้วัดถึงเนื้อเยื่อที่เป็นรอยโรคที่อาจบังเอิญถูกพลาดนำไป
+    \item \textbf{F1-Score:} เป็นค่าเฉลี่ยฮาร์มอนิกของ Precision และ Recall เนื่องจากโดยทั่วไปตัวชี้วัดทั้งสองมักจะทำงานสวนทางกัน ค่า F1-Score จึงทำให้เราเห็นสมดุลและความน่าเชื่อถือภายใต้ความซับซ้อนของข้อมูล
+    \item \textbf{Intersection over Union (IoU):} ประเมินตัวเลขพิกัดความทับซ้อนเชิงพื้นที่ระหว่างสิ่งที่โมเดลทำนายได้กับพื้นที่จริง
+    \item \textbf{Boundary F1 (BF-Score):} ตัวชี้วัดพิเศษที่คอยดูความแม่นยำของเส้นขอบ (Boundary) โดยพิจารณาระดับความสอดคล้องและความแคบของขอบเขตระหว่างสิ่งที่พยากรณ์ได้กับความเป็นจริง เพื่อดูว่าผลลัพธ์รอบนอกของรอยโรคแนบเนียนหรือไม่ อย่างที่ใช้คัดกรองตัวแบบในหัวข้อที่ \ref{tab:model_ranking} 
+\end{itemize}
+
+\textbf{เงื่อนไขสำคัญในการประเมินผล (Exclusion of Background):}
+สิ่งที่เป็นข้อควรระวังอย่างยิ่งในการประเมินประสิทธิภาพการแบ่งส่วนภาพทางการแพทย์คือ สัดส่วนพิกเซลของรอยโรคแทบพ่ายแพ้ให้กับบริเวณพื้นที่ว่าง (Background) ซึ่งมักมีขนาดใหญ่มากกว่าอยู่เสมอ ถ้าหากนำไปคำนวณรวมด้วย จะส่งผลให้บรรดาค่าตัวชี้วัดถูกบิดเบือนและแสดงค่าสูงเกินความเป็นจริง (Overestimation) ดังนั้น ในการคำนวณวัดผลและหาค่าตัวชี้วัดความแม่นยำที่กล่าวมาทั้งหมดข้างต้น \textbf{ผู้วิจัยจะไม่นับรวมผลลัพธ์การทำนายในส่วนของพิกเซลบนคลาสที่เป็นพื้นหลัง (Background) มาคำนวณโดยเด็ดขาด} การเพิกเฉยต่อความถูกต้องส่วนพื้นที่โครงสร้างที่ไม่ใช่เป้าหมาย ทำให้ตัวชี้วัดสะท้อนผลลัพธ์ออกมาเป็นศักยภาพของโมเดลในการตรวจจัดโครงสร้างรอยโรคเป้าหมายล้วนๆ ซึ่งเป็นการประเมินที่มีความเข้มงวด ชัดเจน และสอดคล้องกับจุดประสงค์ของงานวิจัยอย่างเป็นรูปธรรม
