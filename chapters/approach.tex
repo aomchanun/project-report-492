@@ -5,8 +5,6 @@
 \fi
 }
 
-ในบทนี้จะกล่าวถึงหลักการ และการออกแบบระบบ
-
 \makeatletter
 
 % \renewcommand\section{\@startsection {section}{1}{\z@}%
@@ -19,9 +17,101 @@
 % \titleformat{\section}{\normalfont\bfseries}{\thesection}{1em}{}
 % \titlespacing*{\section}{0pt}{10ex}{0pt}
 
+\section{หลักการและการออกแบบการทดลอง (Methodology \& Experimental Design)}
+
+
+\begin{figure}[h!]
+\centering
+\resizebox{\textwidth}{!}{%
+% ปรับสเกลเพื่อให้พอดีกับหน้ากระดาษหากจำเป็น
+\begin{tikzpicture}[node distance=1.2cm and 1.5cm, auto, scale=0.8, transform shape]
+
+    % --- วางตำแหน่งบล็อก (Nodes) ---
+    
+    % แถวบนสุด (Main Flow)
+    \node (prep) [process] {Data Preparation};
+    \node (train) [process, right=of prep] {Train};
+    \node (post) [greyblock, right=of train] {Postprocess};
+    \node (test) [process, right=of post] {Test};
+    \node (eval) [process, right=of test] {Evaluation};
+    
+    % แถวที่สอง (Decision & Output)
+    \node (decide) [decision, below=of eval, yshift=-0.5cm] {Can accuracy be\\improved by data?};
+    \node (end) [endblock, below=of test, xshift=2.5cm, yshift=-0.5cm] {End};
+    
+    % แถวที่สาม (Refinement Path)
+    \node (dataset) [datablock, below=of decide, yshift=-0.5cm] {Dataset};
+    \node (pre) [greyblock, below left=of dataset, xshift=-0.5cm] {Preprocess};
+    \node (add) [datablock, below right=of dataset, xshift=0.5cm] {Add dataset};
+    
+    % บล็อก List รายละเอียด (วางตำแหน่งสัมพัทธ์กับ Train และ Postprocess)
+    \node (details) [listblock, below=of train, xshift=1.5cm, yshift=-0.8cm] {
+        \textbullet\ Redo masks \\
+        \textbullet\ Handling mirrored images \\
+        \textbullet\ Anatomical correctness \\
+        \hspace{0.3cm} checking \\
+        \textbullet\ Object size distribution analysis \\
+        \textbullet\ Tissue ratio analysis in \\
+        \hspace{0.3cm} standard views
+    };
+
+    % --- ลากเส้นเชื่อมต่อ (Edges) ---
+    
+    % เส้นหลักแถวบน
+    \draw [arrow] (prep) -- (train);
+    \draw [arrow] (train) -- (post);
+    \draw [arrow] (post) -- (test);
+    \draw [arrow] (test) -- (eval);
+    
+    % เส้นจาก Evaluation ไปยังคำตัดสิน
+    \draw [arrow] (eval) -- (decide);
+    
+    % เส้นคำตัดสิน (Yes/No)
+    \draw [arrow] (decide) -- node[anchor=west] {Yes} (dataset);
+    \draw [arrow] (decide.east) -| node[anchor=south, xshift=-1cm] {No} (end.north);
+    
+    % เส้นทางแยกจาก Dataset
+    \draw [arrow] (dataset.south) -| (pre.north);
+    \draw [arrow] (dataset.south) -| (add.north);
+    
+    % เส้นประ
+    \draw [dashedline] (details.east) -- ++(0.3cm,0) |- (pre.north east);
+    
+    % --- เส้นย้อนกลับที่ซับซ้อน (Loop Backs) ---
+    
+    % เส้นจาก Preprocess กลับไป Postprocess
+    % ลากลง -> ซ้าย -> ขึ้น -> เข้าบล็อก
+    \draw [arrow] (pre.south) -- ++(0,-0.5cm) -- ++(0.5cm,0) |- (post.south);
+    
+    % เส้นย้อนกลับทั้งหมดไปยัง Data Preparation
+    % ลากลง -> ซ้าย -> ขึ้น -> เข้าบล็อก
+    % จุดเชื่อมใต้ Preprocess และ Add Dataset
+    \coordinate (bottomloop) at ($(pre.south) + (0,-0.8cm)$);
+    \draw [thick] (pre.south) -- ++(0,-0.8cm);
+    \draw [thick] (add.south) -- ++(0,-0.8cm);
+    
+    % ลากเส้นยาวกลับไปหา Data Preparation
+    \draw [arrow] (add.south) -- ++(0,-0.8cm) -- (prep.south |- bottomloop) -- (prep.south);
+    
+    % เส้นประจากรายละเอียดไปยังเส้นย้อนกลับหลัก
+    \draw [dashedline] (details.west) -- ++(-0.2cm,0) |- (prep.south |- bottomloop);
+    
+    % ข้อความ "Refined dataset" (วางบนเส้น)
+    \node [font=\sffamily\bfseries\small, anchor=east] at (prep.south |- details.west) {Refined dataset};
+
+\end{tikzpicture}
+}
+\caption{แผนผังขั้นตอนการพัฒนาแบบจำลองและการปรับปรุงชุดข้อมูลโดยละเอียด}
+\label{fig:detailed_workflow}
+\end{figure}
+
+
+
+
+
 \section{Model Selection}
 
-ในการศึกษาครั้งนี้ได้ทำการคัดเลือกโมเดล (Model Selection) ซึ่งได้เลือก โมเดลจาก github qubvel/segmentation\_models โดยเลือก encoder และ decoder มาอย่างละ 5 อัน รวมทั้งสิน 25 โมเดล เพื่อนำมาทดสอบประสิทธิภาพกับชุดข้อมูล (Dataset) ของเรา โดยมีผลการทดสอบของโมเดลทั้งหมดที่ใช้ในการทดลองดังตารางที่ \ref{tab:all_models} ซึ่งแสดงค่า F1-Score, IoU และ Inference Time (วินาทีต่อรูปภาพ)
+ในการศึกษาครั้งนี้ได้ทำการคัดเลือกโมเดล (Model Selection) ซึ่งได้เลือก โมเดลจาก github qubvel/segmentation\_models \cite{Yakubovskiy:2019} โดยเลือก encoder และ decoder มาอย่างละ 5 อัน รวมทั้งสิน 25 โมเดล เพื่อนำมาทดสอบประสิทธิภาพกับชุดข้อมูล (Dataset) ของเรา โดยมีผลการทดสอบของโมเดลทั้งหมดที่ใช้ในการทดลองดังตารางที่ \ref{tab:all_models} ซึ่งแสดงค่า F1-Score, IoU และ Inference Time (วินาทีต่อรูปภาพ)
 
 \begin{table}[hbt!]
 \centering
@@ -163,22 +253,22 @@
 \centering
 \caption{ผลการจัดอันดับโมเดล (Ranking) จาก 3 ตัวชี้วัดที่เหลือ}
 \label{tab:model_ranking}
-\begin{tabular}{|c|l|c|c|c|c|}
+\begin{tabularx}{\textwidth}{|c|>{\raggedright\arraybackslash}X|c|c|c|c|} % ใช้ X เพื่อให้คอลัมน์ยืดหยุ่น
 \hline
-\textbf{ลำดับ} & \textbf{ชื่อโมเดล (Model)} & \textbf{Rank (F1-Score)} & \textbf{Rank (Hausdorff)} & \textbf{Rank (Inference Time)} & \textbf{คะแนนรวม (ยิ่งน้อยยิ่งดี)} \\
+\textbf{ลำดับ} & \textbf{ชื่อโมเดล (Model)} & \textbf{Rank (F1)} & \textbf{Rank (HD)} & \textbf{Rank (Inf)} & \textbf{คะแนนรวม} \\
 \hline
 8 & DeepLabV3-resnet50 & 1 & 2 & 2 & \textbf{5} \\
 12 & FPN-resnet101 & 2 & 1 & 3 & 6 \\
 13 & DeepLabV3-mobilenet\_v2 & 3 & 3 & 1 & 7 \\
 \hline
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 จากตารางที่ \ref{tab:model_ranking} จะพบว่าเมื่อนำอันดับจากทั้ง 3 ตัวชี้วัดมารวมกัน โมเดล \textbf{DeepLabV3-resnet50} มีผลรวมของคะแนนอันดับที่น้อยที่สุด (5 คะแนน) ซึ่งแสดงให้เห็นอย่างชัดเจนถึงความสมดุลที่ยอดเยี่ยมระหว่างความแม่นยำที่สูงที่สุด (อันดับ 1 ในด้าน F1-Score) ความทนทานและความแม่นยำด้านขอบเขตของภาพ (อันดับ 2 ด้าน Hausdorff) รวมถึงความรวดเร็วในการประมวลผล (อันดับ 2 ด้าน Inference Time) ด้วยเหตุนี้ในงานวิจัยนี้ จึงได้ตัดสินใจคัดเลือกโมเดล \textbf{DeepLabV3-resnet50} เพื่อนำไปใช้งานและพัฒนาจริงในขั้นตอนถัดไป
 
-\section{การ Train}
+\section{การฝึกสอนแบบจำลอง (Train)}
 
-ในการฝึกสอน (Train) โมเดล ได้มีการกำหนดองค์ประกอบต่างๆ รวมถึงสัดส่วนข้อมูล ได้แก่ ชุดข้อมูลสำหรับฝึกสอน (Train) 80\%, ชุดข้อมูลสำหรับตรวจสอบความถูกต้อง (Validation) 10\% และชุดข้อมูลสำหรับทดสอบ (Test) 10\% 
+ในการฝึกสอนแบบจำลอง (Train) ได้มีการกำหนดองค์ประกอบต่างๆ รวมถึงสัดส่วนข้อมูล ได้แก่ ชุดข้อมูลสำหรับฝึกสอน (Train) 80\%, ชุดข้อมูลสำหรับตรวจสอบความถูกต้อง (Validation) 10\% และชุดข้อมูลสำหรับทดสอบ (Test) 10\% 
 
 สำหรับการตั้งค่าสำหรับการฝึกสอนตัวแบบ (Setup) และเทคนิคการเพิ่มความหลากหลายของข้อมูล (Data Augmentation) ได้มีการสรุปรายละเอียดไว้ดังตารางที่ \ref{tab:train_setup} และ \ref{tab:data_augmentation} ตามลำดับ
 
@@ -222,9 +312,9 @@ Batch Size & 16 \\
 \textbf{เหตุผลในการเลือกใช้ฟังก์ชันสูญเสีย (Loss Function):}
 ในการฝึกสอนโมเดล มีการใช้งาน \textbf{Dice Loss} ร่วมกับ \textbf{Cross-Entropy Loss} สาเหตุหลักมาจากการที่ Cross-Entropy Loss เป็นฟังก์ชันมาตรฐานที่ช่วยประเมินและลดทอนความคลาดเคลื่อนในการพยากรณ์พิกเซล ทำให้เสถียรภาพของการแยกแยะคลาสโดยรวมทำงานได้นิ่งและเป็นธรรมชาติ ในขณะเดียวกัน ภาพในการแบ่งส่วนรอยโรคส่วนใหญ่มักประสบปัญหาความไม่สมดุลของคลาส (Class Imbalance) ระหว่างพื้นที่ส่วนที่เป็นรอยโรคกับพื้นที่ส่วนที่เป็นพื้นหลัง (Background) ซึ่งมีขนาดใหญ่กว่ามาก ดังนั้น การใช้ฟังก์ชัน Dice Loss ที่มุ่งเน้นไปที่ค่าความทับซ้อน (Intersection over Union) ร่วมด้วย จึงเป็นการช่วยบังคับให้โมเดลหันมาให้ความสำคัญกับคลาสที่เป็นรอยโรคที่มีขนาดเล็กกว่าอย่างมีประสิทธิภาพมากยิ่งขึ้น ส่งผลให้ความสมบูรณ์และพิกัดความแม่นยำของการจำแนกพื้นที่ (Segmentation accuracy) มีประสิทธิภาพสูงสุด
 
-\section{การ Test}
+\section{การทดสอบและประเมินผลสมรรถนะ (Test \& Evaluation)}
 
-ภายหลังจากขั้นตอนการฝึกสอนตัวแบบ การทดสอบและประเมินผลสมรรถนะ (Test) นับเป็นกระบวนการที่มีความสำคัญเพื่อประเมินขีดความสามารถที่แท้จริงของโมเดลสำหรับการนำไปใช้งาน โดยใช้ข้อมูลในส่วนของชุดทดสอบ (Test Set) ซึ่งเป็นรูปภาพที่ตัวแบบไม่เคยเห็นจากการฝีกสอนมาก่อนเลย (Unseen Data) ทำให้ผู้วิจัยสามารถสังเกตพัฒนาการและการเรียนรู้ประยุกต์ใช้ลักษณะเด่นของโมเดลต่อข้อมูลในสถานการณ์ที่เป็นรูปภาพใหม่ได้อย่างแม่นยำ
+ภายหลังจากขั้นตอนการฝึกสอนตัวแบบ การทดสอบและประเมินผลสมรรถนะ (Test \& Evaluation) นับเป็นกระบวนการที่มีความสำคัญเพื่อประเมินขีดความสามารถที่แท้จริงของโมเดลสำหรับการนำไปใช้งาน โดยใช้ข้อมูลในส่วนของชุดทดสอบ (Test Set) ซึ่งเป็นรูปภาพที่ตัวแบบไม่เคยเห็นจากการฝีกสอนมาก่อนเลย (Unseen Data) ทำให้ผู้วิจัยสามารถสังเกตพัฒนาการและการเรียนรู้ประยุกต์ใช้ลักษณะเด่นของโมเดลต่อข้อมูลในสถานการณ์ที่เป็นรูปภาพใหม่ได้อย่างแม่นยำ
 
 สำหรับการประเมินประสิทธิภาพของการแบ่งส่วน (Segmentation Evaluation) ในโปรเจกต์นี้ ตัวชี้วัดที่ถูกนำมาพิจารณาประกอบไปด้วย 5 ค่าหลัก ดังต่อไปนี้:
 \begin{itemize}
@@ -319,19 +409,19 @@ Batch Size & 16 \\
 
 นอกจากนี้ ยังมีการกำหนดเงื่อนไขเฉพาะสำหรับบางคลาส ได้แก่ การยกเว้นการรวมบริเวณสำหรับคลาสฟัน (Tooth) และริมฝีปาก (Lips) ที่มีขนาดเกินกว่าเกณฑ์สัญญาณรบกวนขั้นต่ำ เพื่อรักษาความถูกต้องเชิงกายวิภาคของข้อมูล
 
-\subsection{การรวมพื้นหลังภายในวัตถุ (Background Hole Merging)}
+\subsection{การปรับปรุงช่องว่างภายในวัตถุ (Hole Refinement)}
 
-ในขั้นตอนนี้ ได้ดำเนินการตรวจสอบบริเวณพื้นหลัง (background) ที่อยู่ภายในวัตถุ โดยใช้การวิเคราะห์ connected components เพื่อระบุบริเวณที่เป็นช่องว่างภายใน (holes)
+ในขั้นตอนนี้ ได้ดำเนินการปรับปรุงบริเวณช่องว่างภายในวัตถุ โดยแบ่งออกเป็น 2 กระบวนการย่อย ได้แก่ การรวมพื้นหลังตามบริบท และการเติมเต็มช่องว่างเชิงโครงสร้าง
 
-สำหรับ background components ที่ถูกล้อมรอบด้วยวัตถุคลาสอื่นทั้งหมด และไม่ได้สัมผัสกับขอบของภาพ จะทำการวิเคราะห์คลาสของวัตถุรอบข้าง และเลือกคลาสที่มีจำนวนพิกเซลรอบข้างมากที่สุดเป็นคลาสเป้าหมาย จากนั้นทำการรวม background component เข้ากับคลาสดังกล่าว
+\subsubsection{การรวมพื้นหลังที่อยู่ภายในวัตถุ (Background Hole Merging)}
 
-กระบวนการนี้ช่วยแก้ไขปัญหาช่องว่างภายในวัตถุ และทำให้โครงสร้างของอวัยวะมีความต่อเนื่องมากขึ้น
+ในขั้นตอนนี้ ได้ทำการตรวจสอบพิกเซลคลาสพื้นหลัง (background) ที่อยู่ภายในวัตถุ โดยใช้การวิเคราะห์ connected components เพื่อระบุว่าเป็นบริเวณที่เป็นช่องว่าง (holes) ซึ่งถูกล้อมรอบด้วยวัตถุคลาสอื่น
+เมื่อรู้แล้วว่ามี background components ที่อยู่ภายในวัตถุ จะทำการวิเคราะห์คลาสของพิกเซลรอบข้าง component นั้นๆ และเลือกคลาสที่มีจำนวนพิกเซลมากที่สุดเป็นคลาสเป้าหมาย จากนั้นทำการรวม component ดังกล่าวเข้ากับคลาสนั้น
 
-\subsection{การเติมเต็มช่องว่างภายในวัตถุ (Hole Filling)}
+\subsubsection{การเติมเต็มช่องว่างเชิงโครงสร้าง (Morphological Hole Filling)}
 
-ในขั้นตอนสุดท้าย ได้ดำเนินการเติมเต็มช่องว่างหรือรูพรุนขนาดเล็กที่ยังคงหลงเหลืออยู่ภายในวัตถุ โดยใช้เทคนิคทางสัณฐานวิทยา (morphological operations)
-กระบวนการนี้ช่วยให้โครงสร้างของวัตถุมีความสมบูรณ์ ลดความไม่ต่อเนื่องของพิกเซล และทำให้ Ground truth มีความเหมาะสมสำหรับการฝึกแบบจำลองมากยิ่งขึ้น
-
+หลังจากรวมพื้นหลังที่อยู่ภายในวัตถุแล้ว ก็จะทำการเติมเต็มช่องว่างขนาดเล็กที่ยังคงหลงเหลืออยู่ โดยใช้เทคนิคทางสัณฐานวิทยา (morphological operations) เช่น การปิด (closing) ซึ่งเป็นการดำเนินการ dilation ตามด้วย erosion เพื่อเติมเต็มช่องว่างเล็กๆ ภายในวัตถุที่อาจเกิดจากความผิดพลาดในการทำ labeling หรือจากการรวมวัตถุขนาดเล็กในขั้นตอนก่อนหน้า
+กระบวนการนี้ช่วยให้โครงสร้างของวัตถุมีความต่อเนื่องและสมบูรณ์มากยิ่งขึ้น
 
 \section{การปรับปรุงผลลัพธ์ (Post-processing)}
 
