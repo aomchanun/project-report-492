@@ -4,6 +4,108 @@
 \ifenglish System Evaluation\else การประเมินระบบ\fi
 \fi}
 
+\section{ผลการวิเคราะห์การกระจายของขนาดวัตถุ (Object Size Distribution Analysis)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{images/histogram_obj_distribution.png}
+\caption{แผนภาพฮิสโตแกรมจากการวิเคราะห์ Object Size Distribution (Distribution of Detected Objects by Size Percentage)}
+\label{fig:object_size_distribution}
+\end{figure}
+
+\subsection{การกระจายขนาด Object}
+
+จากการวิเคราะห์การกระจายตัวของขนาดวัตถุ ในรูปที่ \ref{fig:object_size_distribution} พบว่าลักษณะการกระจายข้อมูลมีความเบ้อย่างมีนัยสำคัญ โดยสามารถสรุปประเด็นสำคัญได้ดังนี้:
+
+\begin{itemize}
+    \item \textbf{การตรวจพบความผิดปกติในกลุ่มขนาดเล็กมาก:} วัตถุที่มีขนาดในช่วงร้อยละ 0-0.05 ของพื้นที่พิกเซลทั้งหมด มีจำนวนสูงถึงประมาณ 8,500 วัตถุ ซึ่งถือเป็นสัดส่วนที่สูงที่สุดในฮิสโตแกรมอย่างชัดเจน ปริมาณที่สูงผิดปกตินี้บ่งชี้ถึงการมีอยู่ของสัญญาณรบกวน (Noise) หรือความผิดพลาดในระดับพิกเซลที่เกิดขึ้นในกระบวนการสร้าง Ground Truth
+    
+    \item \textbf{ผลกระทบต่อประสิทธิภาพของแบบจำลอง:} การที่มีวัตถุขนาดเล็ก (Small Outliers) จำนวนมาก กระจายตัวอยู่ในข้อมูลสอน อาจส่งผลให้แบบจำลองการเรียนรู้เชิงลึกเกิดความสับสนในการจำแนกขอบเขตที่แท้จริงของเนื้อเยื่อ และอาจนำไปสู่ปัญหาการเรียนรู้ลักษณะที่ไม่พึงประสงค์
+\end{itemize}
+
+จากข้อมูลข้างต้น มีความจำเป็นอย่างยิ่งในการนำเทคนิคการลดสัญญาณรบกวน (Noise Reduction) เช่น การใช้ตัวกรองเชิงสัณฐานวิทยา (Morphological Filtering) หรือการกำหนดเกณฑ์ขนาดขั้นต่ำ (Area Thresholding) มาใช้ในขั้นตอนการประมวลผลข้อมูลขั้นต้น (Preprocessing) เพื่อกำจัดวัตถุที่ไม่เกี่ยวข้องกับโครงสร้างทางกายวิภาคออกไป
+ภาพที่ \ref{fig:preprocessing_example} แสดงตัวอย่างภาพก่อนและหลังการใช้เทคนิคการประมวลผลข้อมูลขั้นต้น (Preprocessing) เพื่อกำจัดวัตถุขนาดเล็กที่เป็นสัญญาณรบกวนออกไป ซึ่งจะช่วยให้แบบจำลองสามารถเรียนรู้ลักษณะของเนื้อเยื่อปกติได้อย่างมีประสิทธิภาพมากยิ่งขึ้น
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/preprocessing.png}
+\caption{ตัวอย่างภาพก่อนและหลังการใช้เทคนิคการประมวลผลข้อมูลขั้นต้น (Preprocessing)}
+\label{fig:preprocessing_example}
+\end{figure}
+
+
+
+
+\section{ผลการวิเคราะห์ความสัมพันธ์ระหว่างคลาส (Class Containment Analysis)}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/class_containment.png}
+\caption{การแจกแจงจำนวนภาพตามความสัมพันธ์เชิงพื้นที่ของอวัยวะในช่องปาก 10 อันดับแรก}
+\label{fig:class_containment}
+\end{figure}
+
+จากการวิเคราะห์ความสัมพันธ์เชิงการครอบ (class containment) โดยใช้เงื่อนไขว่า \textit{"หากวัตถุ A ถูกล้อมรอบด้วยเส้นขอบของวัตถุ B มากกว่า 95\% ของความยาวเส้นรอบรูปของวัตถุ A จะทำการรวมคลาส A เข้ากับคลาส B"} พบว่ามีรูปแบบความสัมพันธ์ทั้งหมด 41 รูปแบบ โดยรูปที่ \ref{fig:class_containment} แสดง 10 อันดับแรกของความสัมพันธ์ที่พบมากที่สุด
+
+ผลการวิเคราะห์พบว่า ความสัมพันธ์ระหว่างคลาสบางคู่มีความถี่สูงอย่างมีนัยสำคัญ เช่น Buccal/Labial Mucosa in Outer Lips ซึ่งพบมากที่สุด รองลงมาคือ Buccal Mucosa in Tooth และ Tooth in Gingiva ซึ่งสะท้อนให้เห็นว่าบริเวณขอบเขตระหว่างอวัยวะที่อยู่ใกล้เคียงกันมีแนวโน้มเกิดการทำนายซ้อนทับ หรือการระบุขอบเขตคลาดเคลื่อน
+
+นอกจากนี้ ยังพบว่าคลาส Buccal Mucosa ปรากฏในหลายความสัมพันธ์ ซึ่งอาจเกิดจากลักษณะของคลาสที่มีพื้นที่กว้างและพบได้ในหลายตำแหน่งภายในช่องปาก ส่งผลให้แบบจำลองมีแนวโน้มทำนายคลาสนี้แทรกอยู่ในบริเวณของคลาสอื่น
+
+ในขณะเดียวกัน พบความสัมพันธ์บางรูปแบบที่ไม่สอดคล้องกับลักษณะทางกายวิภาค เช่น Outer Lips in Buccal Mucosa หรือ Tongue in Tooth ซึ่งบ่งชี้ถึงข้อผิดพลาดของแบบจำลองในการทำนาย และสามารถนำมาใช้เป็นข้อมูลสำหรับออกแบบกฎในการปรับปรุงผลลัพธ์ในขั้นตอน post-processing
+อย่างไรก็ตาม มีบางความสัมพันธ์ที่ถูกต้องตามหลักกายวิภาค ได้แก่ ฟันอยู่ในเหงือก (Tooth in Gingiva), ลิ้นบนอยู่ในริมฝีปาก (Dorsal Tongue in Outer Lips), ลิ้นล่างอยู่ในรมฝีปาก (Ventral Tongue in Outer Lips) และ ฟันในริมฝีปาก (Tooth in Outer Lips) 
+ซึ่งความสัมพันธ์เหล่านี้ (ดังแสดงในรูปที่ \ref{fig:anatomical_correct}) จะได้รับการยกเว้นจากการรวมคลาส (Skip) เพื่อรักษาความถูกต้องของโครงสร้างทางกายวิภาคที่แท้จริงเอาไว้
+ซึ่งแสดงให้เห็นว่าไม่ใช่ทุกความสัมพันธ์ที่เกิดขึ้นเป็นข้อผิดพลาด และบางความสัมพันธ์อาจสะท้อนถึงลักษณะทางกายวิภาคที่แท้จริงของข้อมูล
+
+
+\begin{figure}[H]
+     \centering
+     % รูปที่ 1: Tooth in Gingiva
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/forbidden_1.png}
+         \caption{Tooth in Gingiva}
+     \end{subfigure}
+     \hfill
+     % รูปที่ 2: Dorsal Tongue in Outer Lips
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/forbidden_2.png}
+         \caption{Dorsal Tongue in Outer Lips}
+     \end{subfigure}
+
+     \vspace{0.5cm} % เพิ่มระยะห่างระหว่างแถวบนกับแถวล่าง
+
+     % รูปที่ 3: Ventral Tongue in Outer Lips
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/forbidden_3.png}
+         \caption{Ventral Tongue in Outer Lips}
+     \end{subfigure}
+     \hfill
+     % รูปที่ 4: Tooth in Outer Lips
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{images/forbidden_4.png}
+         \caption{Tooth in Outer Lips}
+     \end{subfigure}
+     
+     \caption{ความสัมพันธ์ที่ถูกต้องตามหลักกายวิภาค (Anatomically Correct Class Containment) ทั้ง 4 รูปแบบ}
+     \label{fig:anatomical_correct}
+\end{figure}
+
+
+โดยรวมแล้ว การกระจายของความสัมพันธ์แสดงให้เห็นว่าข้อผิดพลาดของแบบจำลองไม่ได้เกิดขึ้นแบบสุ่ม แต่มีรูปแบบที่เกิดซ้ำในบางคู่ของคลาสอย่างชัดเจน ซึ่งสามารถนำไปใช้ในการพัฒนาแนวทาง rule-based correction เพื่อเพิ่มความถูกต้องของผลลัพธ์การแบ่งส่วนภาพได้อย่างมีประสิทธิภาพ
+
+หลังจากนั้นนำความสัมพันธ์ที่ได้มาทำ Rule-based correction จะได้ผลลัพธ์ ดังนี้
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/postprocessing.png}
+\caption{ผลลัพธ์หลังจากการปรับปรุงด้วย Rule-based (Results after Rule-based Correction)}
+\label{fig:class_containment_after_correction}
+\end{figure}
+
+
+
 \section{ผลการทดลองที่ 1: การฝึกสอนด้วยชุดข้อมูลดั้งเดิม (Baseline Training with Old Dataset)}
 ในการทดลองเบื้องต้น ผู้วิจัยได้ใช้ชุดข้อมูลดั้งเดิม (Old Dataset) เพื่อสร้างค่ามาตรฐานอ้างอิง (Baseline) สำหรับการประเมินประสิทธิภาพของโมเดล โดยได้แยกการวัดผลออกเป็นกรณีภาพถ่ายที่ไม่มีรอยโรคและกรณีภาพถ่ายที่มีรอยโรค
 
@@ -51,7 +153,7 @@ Hard Palate & 0.564206 & 0.679497 & 0.616508 & 0.445617 & 0.740124 \\ \hline
 \end{tabular}
 \end{table}
 
-ในบทนี้จะเป็นการนำเสนอผลการทดลองและประเมินประสิทธิภาพของตัวแบบในแต่ละขั้นตอนตามที่ได้วางแผนไว้ในบทที่ 3 โดยจะเริ่มจากการวิเคราะห์ผลลัพธ์เชิงปริมาณ (Quantitative Results) ของการทดลองที่มีความสำคัญ
+ในบทนี้จะเป็นการนำเสนอผลการทดลองและประเมินประสิทธิภาพของตัวแบบในแต่ละขั้นตอนตามที่ได้วางแผนไว้ในบทที่ 3 โดยจะเริ่มจากการวิเคราะห์ผลลัพธ์เชิงปริมาณของการทดลองที่มีความสำคัญ
 
 \section{ผลการทดลองที่ 2: การฝึกสอนด้วยชุดข้อมูลฉบับปรับปรุง (New Dataset)}
 ในการทดลองนี้ ผู้วิจัยได้ใช้ชุดข้อมูลที่ผ่านการทำความสะอาดและปรับปรุงค่า Ground Truth ใหม่ทั้งหมด เพื่อทดสอบประสิทธิภาพของโมเดล DeepLabV3-resnet50 โดยได้แยกการวัดผลออกเป็นสองกรณีหลัก ได้แก่ กรณีภาพถ่ายที่ไม่มีรอยโรค และกรณีภาพถ่ายที่มีรอยโรค
@@ -250,11 +352,11 @@ Ventral Tongue & 0.875597 & 0.870852 & 0.873218 & 0.774966 & 0.771889 \\ \hline
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{images/DSC_0137(1)} \\
-    \small (ก) ตัวอย่างภาพที่ 1 \\[2ex]
+    \small (a) ตัวอย่างภาพที่ 1 \\[2ex]
     \includegraphics[width=0.7\textwidth]{images/DSC_00450.png} \\
-    \small (ข) ตัวอย่างภาพที่ 2 \\[2ex]
+    \small (b) ตัวอย่างภาพที่ 2 \\[2ex]
     \includegraphics[width=0.7\textwidth]{images/DSC_7929.png} \\
-    \small (ค) ตัวอย่างภาพที่ 3
+    \small (c) ตัวอย่างภาพที่ 3
     \caption{การแสดงผลลัพธ์การแบ่งส่วนพื้นที่เนื้อเยื่อจากโมเดลขั้นสุดท้าย (Final Model)}
     \label{fig:qualitative_results}
 \end{figure}

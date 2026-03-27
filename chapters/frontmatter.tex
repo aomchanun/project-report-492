@@ -3,23 +3,23 @@
 
 \ifproject
 \begin{abstractTH}
-เขียนบทคัดย่อของโครงงานที่นี่
+โครงงานนี้มุ่งศึกษาประสิทธิภาพของแบบจำลองการแบ่งส่วนภาพเชิงความหมาย (semantic segmentation) สำหรับการระบุอวัยวะในช่องปากภายใต้บริบทที่มีรอยโรคร่วม ซึ่งเป็นปัญหาที่มีความท้าทายสูง เนื่องจากรอยโรคสามารถก่อให้เกิดการบิดเบือนลักษณะเชิงกายวิภาค ส่งผลให้แบบจำลองมีความคลาดเคลื่อนในการทำนาย โดยเฉพาะในกรณีข้อมูลที่ไม่ปรากฏในชุดฝึก
 
-การเขียนรายงานเป็นส่วนหนึ่งของการทำโครงงานวิศวกรรมคอมพิวเตอร์
-เพื่อทบทวนทฤษฎีที่เกี่ยวข้อง อธิบายขั้นตอนวิธีแก้ปัญหาเชิงวิศวกรรม และวิเคราะห์และสรุปผลการทดลองอุปกรณ์และระบบต่างๆ
-\enskip อย่างไรก็ดี การสร้างรูปเล่มรายงานให้ถูกรูปแบบนั้นเป็นขั้นตอนที่ยุ่งยาก
-แม้ว่าจะมีต้นแบบสำหรับใช้ในโปรแกรม Microsoft Word แล้วก็ตาม
-แต่นักศึกษาส่วนใหญ่ยังคงค้นพบว่าการใช้งานมีความซับซ้อน และเกิดความผิดพลาดในการจัดรูปแบบ กำหนดเลขหัวข้อ และสร้างสารบัญอยู่
-\enskip ภาควิชาวิศวกรรมคอมพิวเตอร์จึงได้จัดทำต้นแบบรูปเล่มรายงานโดยใช้ระบบจัดเตรียมเอกสาร
-\LaTeX{} เพื่อช่วยให้นักศึกษาเขียนรายงานได้อย่างสะดวกและรวดเร็วมากยิ่งขึ้น
+การศึกษานี้ดำเนินการประเมินแบบจำลองการเรียนรู้เชิงลึกหลายสถาปัตยกรรม ได้แก่ U-Net, LinkNet, DeepLabV3+ และ UPerNet ร่วมกับ encoder ที่หลากหลาย ภายใต้กรอบการทดลอง 3 รูปแบบ ได้แก่ แบบจำลองพื้นฐาน (baseline), แบบจำลองร่วมกับกระบวนการเตรียมข้อมูล (preprocessing) และแบบจำลองที่ผสาน preprocessing และการปรับปรุงผลลัพธ์ (post-processing)
+ในส่วนของ preprocessing ได้มีการออกแบบวิธีการเพื่อปรับปรุงคุณภาพข้อมูลและลดความแปรปรวนของภาพ ขณะที่ post-processing ใช้แนวทางเชิงกฎ (rule-based) และการวิเคราะห์การเชื่อมต่อของพิกเซล (connectivity analysis) เพื่อแก้ไขข้อผิดพลาดเชิงโครงสร้างและเพิ่มความสอดคล้องทางกายวิภาคของผลลัพธ์
+
+ผลการทดลองเชิงปริมาณและเชิงคุณภาพแสดงให้เห็นว่า การผสาน preprocessing และ post-processing สามารถยกระดับประสิทธิภาพของแบบจำลองได้อย่างมีนัยสำคัญ โดยเฉพาะในกรณีภาพที่มีรอยโรค ซึ่งช่วยลดข้อผิดพลาดเชิงพื้นที่และปรับปรุงความสมเหตุสมผลของ segmentation mask
+งานวิจัยนี้ชี้ให้เห็นถึงข้อจำกัดของแบบจำลอง segmentation ภายใต้ข้อมูลที่มีความซับซ้อนสูง และเสนอแนวทางในการปรับปรุง pipeline เพื่อเพิ่มความทนทาน (robustness) ของระบบในบริบทการใช้งานจริงทางการแพทย์
 \end{abstractTH}
 
 \begin{abstract}
-The abstract would be placed here. It usually does not exceed 350 words
-long (not counting the heading), and must not take up more than one (1) page
-(even if fewer than 350 words long).
+This study investigates the performance of semantic segmentation models for oral tissue segmentation under lesion-aware conditions, which pose significant challenges due to anatomical distortions caused by pathological regions. Such variations often degrade model generalization, particularly for unseen data distributions.
 
-Make sure your abstract sits inside the \texttt{abstract} environment.
+Multiple deep learning architectures, including U-Net, LinkNet, DeepLabV3+, and UPerNet, are systematically evaluated in conjunction with various encoder backbones. The experimental framework consists of three configurations: (1) baseline models, (2) models enhanced with preprocessing, and (3) models integrating both preprocessing and post-processing.
+The preprocessing pipeline is designed to improve data quality and reduce inter-sample variability, while the post-processing stage incorporates rule-based refinement and pixel connectivity analysis to correct structural inconsistencies and enforce anatomical plausibility in the segmentation outputs.
+
+Both quantitative and qualitative results demonstrate that the integration of preprocessing and post-processing leads to significant performance improvements, particularly in lesion-containing images. The proposed approach effectively reduces spatial errors and enhances the structural coherence of predicted segmentation masks.
+This work highlights the limitations of segmentation models in handling complex medical imaging scenarios and proposes a practical pipeline to improve model robustness and reliability for real-world clinical applications.
 \end{abstract}
 
 \iffalse
@@ -31,10 +31,31 @@ Dedication page is optional.
 \fi % \iffalse
 
 \begin{acknowledgments}
-Your acknowledgments go here. Make sure it sits inside the
-\texttt{acknowledgment} environment.
+โครงงานเรื่อง "การแบ่งส่วนเนื้อเยื่อในช่องปากโดยตระหนักถึงการมีของรอยโรค" จะไม่สําเร็จลุล่วงได้ หากไม่ได้รับความกรุณาและความช่วยเหลือจากหน่วยงานต่าง ๆ และท่านผู้มีพระคุณหลายท่าน
 
-\acksign{2020}{5}{25}
+ข้าพเจ้าขอกราบขอบพระคุณ รองศาสตราจารย์ ดร.ปฏิเวธ วุฒิสารวัฒนา อาจารย์ที่ปรึกษาโครงงาน จาก
+คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่ ที่ได้เสียสละเวลาให้คําแนะนํา ให้ข้อเสนอแนะ รวมถึงแนวทาง
+ในการดําเนินงานโครงงานตลอดระยะเวลาการศึกษา อีกทั้งยังช่วยตรวจสอบ แก้ไขข้อบกพร่องต่าง ๆ ด้วย
+ความเอาใจใส่ จนทําให้โครงงานนี้มีความสมบูรณ์ยิ่งขึ้น
+
+ข้าพเจ้าขอขอบคุณ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่ ที่ได้เอื้ออํานวยสถานที่ อุปกรณ์ และ
+ความสนับสนุนทางด้านต่าง ๆ ที่จําเป็นต่อการทําโครงงาน ตลอดจนการอํานวยความสะดวกในทุกขั้นตอน
+ของการดําเนินงาน
+
+ขอขอบพระคุณ ศูนย์ทันตสาธารณสุขระหว่างประเทศ กรมอนามัย กระทรวงสาธารณสุข ที่ให้การสนับสนุนข้อมูลและความรู้ทางด้านทันตสาธารณสุข อันมีประโยชน์อย่างยิ่งต่อโครงงานนี้
+
+ขอขอบคุณ คณะทันตแพทยศาสตร์ มหาวิทยาลัยเชียงใหม่ และ คณะทันตแพทยศาสตร์ มหาวิทยาลัย
+ธรรมศาสตร์ ที่ให้ความอนุเคราะห์ด้านข้อมูล ด้านวิชาการ และร่วมสนับสนุนการดําเนินงานของโครงงานใน
+ครั้งนี้
+
+ขอขอบคุณผู้ปกครอง เพื่อน และผู้มีส่วนเกี่ยวข้องทุกท่าน ที่ให้กําลังใจ คําแนะนํา และความช่วยเหลือ
+ในด้านต่าง ๆ ตลอดระยะเวลาการทําโครงงาน ซึ่งเป็นแรงผลักดันสําคัญที่ทําให้โครงงานฉบับนี้สําเร็จลุล่วงได้
+อย่างสมบูรณ์
+
+สุดท้ายนี้หากโครงงานนี้มีข้อผิดพลาดประการใด ข้าพเจ้าขอกราบขออภัยมา ณ ที่นี้ และพร้อมน้อมรับ
+ข้อเสนอแนะเพื่อนําไปปรับปรุงให้ดียิ่งขึ้นต่อไป
+
+\acksign{2026}{3}{27}
 \end{acknowledgments}%
 \fi % \ifproject
 

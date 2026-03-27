@@ -1,4 +1,4 @@
-\documentclass[semifinal]{cpecmu}
+\documentclass[final]{cpecmu}
 
 %% This is a sample document demonstrating how to use the CPECMU
 %% project template. If you are having trouble, see "cpecmu.pdf" for
@@ -70,40 +70,7 @@
 % \includeonly{chapters/intro,chapters/background}
 
 \usepackage{float}
-\usepackage[utf8]{inputenc}
-\usepackage{geometry}
-
-% --- ส่วนที่จำเป็นสำหรับการวาด Diagram ---
-\usepackage{tikz}
-\usetikzlibrary{shapes.geometric, arrows, positioning, calc}
-
-% --- กำหนดสไตล์ของบล็อกต่างๆ ---
-% กำหนดสไตล์พื้นฐาน (เงา, ขอบโค้ง, การจัดข้อความศูนย์กลาง)
-\tikzstyle{base} = [rectangle, rounded corners, minimum width=3cm, minimum height=1.5cm, text centered, draw=black, font=\sffamily\small]
-
-% สไตล์สำหรับบล็อกหลัก (สีน้ำเงินเข้ม)
-\tikzstyle{process} = [base, fill=blue!50!gray!80, text=white]
-
-% สไตล์สำหรับบล็อก Postprocess/Preprocess (สีเทาอ่อน)
-\tikzstyle{greyblock} = [base, fill=gray!20]
-
-% สไตล์สำหรับบล็อก Dataset (สีน้ำเงินอ่อน)
-\tikzstyle{datablock} = [base, fill=blue!15]
-
-% สไตล์สำหรับบล็อก End (สีฟ้าสดใส)
-\tikzstyle{endblock} = [base, fill=blue!40]
-
-% สไตล์สำหรับบล็อกคำตัดสิน (สีขาว/ไม่มีสี)
-\tikzstyle{decision} = [rectangle, text centered, font=\sffamily\small, minimum width=4cm, text width=4.5cm]
-
-% สไตล์สำหรับบล็อก List รายละเอียด (สีน้ำเงินอ่อน, ชิดซ้าย)
-\tikzstyle{listblock} = [base, fill=blue!10, text width=6cm, align=left, font=\sffamily\small]
-
-% สไตล์สำหรับลูกศร
-\tikzstyle{arrow} = [thick,->,>=stealth]
-% สไตล์สำหรับเส้นประ
-\tikzstyle{dashedline} = [thick, dashed, -]
-
+\usepackage{subcaption}
 
 \begin{document}
 \include{chapters/frontmatter}
@@ -123,21 +90,40 @@
 
 \ifproject
 \normalspacing
-\appendix
-\include{chapters/appendix}
+% \appendix
+% \include{chapters/appendix}
 
-%% Display glossary (optional) -- need glossary option.
-\ifglossary\glossarypage\fi
+% %% Display glossary (optional) -- need glossary option.
+% \ifglossary\glossarypage\fi
 
-%% Display index (optional) -- need idx option.
-\ifindex\indexpage\fi
+% %% Display index (optional) -- need idx option.
+% \ifindex\indexpage\fi
 
 \begin{biosketch}
 \begin{center}
-  \includegraphics[width=1.5in]{mugshot.jpg}
+  \includegraphics[width=1.5in]{images/korarit.jpg}
 \end{center}
-Your biosketch goes here. Make sure it sits inside
-the \texttt{biosketch} environment.
+\textbf{ชื่อ-นามสกุล:} นายกรฤทธิ์ ปั้นนพศรี \\
+\textbf{รหัสนักศึกษา:} 650610744 \\
+\textbf{การศึกษา:} นักศึกษาชั้นปีที่ 4 ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่ \\
+\textbf{Email:} \href{mailto:nhuneqw@gmail.com}{nhuneqw@gmail.com} \\
+\\
+\\
+\\
+\\
+\begin{center}
+  \includegraphics[width=1.5in]{images/chanuntorn.jpg}
+\end{center}
+\textbf{ชื่อ-นามสกุล:} นางสาวชนันธร เชียงปวน \\
+\textbf{รหัสนักศึกษา:} 650610754 \\
+\textbf{การศึกษา:} นักศึกษาชั้นปีที่ 4 ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเชียงใหม่ \\
+\textbf{Email:} \href{mailto:aomchanun.c@gmail.com}{aomchanun.c@gmail.com}
 \end{biosketch}
 \fi % \ifproject
+
+
+
+
+
+
 \end{document}
